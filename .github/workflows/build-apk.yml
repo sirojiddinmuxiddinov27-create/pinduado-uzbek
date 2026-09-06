@@ -1,0 +1,49 @@
+name: Android APK Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodni olish
+        uses: actions/checkout@v4
+
+      - name: Node.js o'rnatish
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: JDK 17 o'rnatish
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android SDK o'rnatish
+        uses: android-actions/setup-android@v3
+
+      - name: Android litsenziyalarini qabul qilish
+        run: yes | sdkmanager --licenses || true
+
+      - name: Bog'liqliklarni o'rnatish
+        run: npm install --legacy-peer-deps
+
+      - name: Native Android loyihasini generatsiya qilish
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Gradle bilan APK yig'ish (debug)
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: APK faylini saqlash (Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinduado-uzbek-overlay-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
