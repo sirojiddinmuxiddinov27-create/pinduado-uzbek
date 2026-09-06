@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Kodni olish
         uses: actions/checkout@v4
@@ -35,13 +36,22 @@ jobs:
       - name: Native Android loyihasini generatsiya qilish
         run: npx expo prebuild --platform android --no-install
 
-      - name: Gradle bilan APK yig'ish (debug)
+      - name: Gradle xotirasini sozlash
+        working-directory: android
+        run: |
+          echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" >> gradle.properties
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+          echo "newArchEnabled=false" >> gradle.properties
+          echo "hermesEnabled=true" >> gradle.properties
+
+      - name: Gradle bilan APK yig'ish
         working-directory: android
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: APK faylini saqlash (Artifact)
+      - name: APK faylini saqlash
         uses: actions/upload-artifact@v4
         with:
           name: pinduado-uzbek-overlay-apk
