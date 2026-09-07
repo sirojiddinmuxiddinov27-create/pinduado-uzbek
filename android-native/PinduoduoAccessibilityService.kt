@@ -119,7 +119,7 @@ class PinduoduoAccessibilityService : AccessibilityService() {
             return
         }
 
-        val baseUrl = HttpUrl.parse(TRANSLATE_URL)
+                val baseUrl = TRANSLATE_URL.toHttpUrlOrNull())
         if (baseUrl == null) {
             callback(text)
             return
